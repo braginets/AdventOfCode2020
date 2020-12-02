@@ -4,11 +4,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 
-data class Policy(val min: Int, val max: Int, val letter: Char)
+data class Policy(val pos1: Int, val pos2: Int, val letter: Char)
 data class Record(val policy: Policy, val password: String) {
     fun valiatePass(): Boolean {
-        var syms = password.toCharArray().filter { it == policy.letter }.toList()
-        val result = ((syms.count() >= policy.min) && (syms.count() <= policy.max))
+        val isPos1 = password.toCharArray()[policy.pos1 - 1] == policy.letter
+        val isPos2 = password.toCharArray()[policy.pos2 - 1] == policy.letter
+        val result = isPos1.xor(isPos2)
         return result
     }
 }
