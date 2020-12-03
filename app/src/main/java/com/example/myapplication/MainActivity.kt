@@ -18,27 +18,50 @@ class MainActivity : AppCompatActivity() {
         return list.toTypedArray()
     }
 
-    private fun start() {
+    data class Slope(val x: Int, val y: Int)
 
-        Log.d("AoC", "Start");
-        val data = readFile()
+    private fun treeCounter(data: Array<String>, slope: Slope): Int {
+
         var x: Int = 0
+        var y: Int = 0
+        val lineLength = 31
+
         var treeCounter: Int = 0
 
-        for (d in data) {
-            
-            if (d.get(x) == '#') {
+        while (y < data.count()) {
+
+            if (data[y].get(x) == '#') {
                 treeCounter ++
             }
 
-            x += 3
-            if (x > 30) {
-                x -= 31
+            x += slope.x
+            y += slope.y
+
+            if (x > (lineLength - 1)) {
+                x -= lineLength
             }
 
         }
 
-        Log.d("AoC", treeCounter.toString());
+        return treeCounter
+    }
+
+    private fun start() {
+
+        Log.d("AoC", "Start");
+        val data = readFile()
+
+        val slopes = arrayOf(Slope(1,1), Slope(3,1), Slope(5,1), Slope(7,1), Slope(1,2))
+
+        var trees: Int = 1
+
+        for (slope in slopes) {
+            val treesForSlope = treeCounter(data, slope)
+            Log.d("AoC - trees", treesForSlope.toString());
+            trees *= treesForSlope
+        }
+
+        Log.d("AoC - result", trees.toString());
     }
 }
 
