@@ -4,24 +4,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 
-data class Policy(val pos1: Int, val pos2: Int, val letter: Char)
-data class Record(val policy: Policy, val password: String) {
-    fun valiatePass(): Boolean {
-        val isPos1 = password.toCharArray()[policy.pos1 - 1] == policy.letter
-        val isPos2 = password.toCharArray()[policy.pos2 - 1] == policy.letter
-        val result = isPos1.xor(isPos2)
-        return result
-    }
-}
-
 class MainActivity : AppCompatActivity() {
-
-    var data = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        calculate()
+        start()
     }
 
     fun readFile(): Array<String> {
@@ -30,34 +18,27 @@ class MainActivity : AppCompatActivity() {
         return list.toTypedArray()
     }
 
-
-
-
-    private fun calculate() {
+    private fun start() {
 
         Log.d("AoC", "Start");
-
         val data = readFile()
+        var x: Int = 0
+        var treeCounter: Int = 0
 
+        for (d in data) {
+            
+            if (d.get(x) == '#') {
+                treeCounter ++
+            }
 
-        val records: List<Record> = data.map {
-            val record = it.splitToSequence(" ", "-", ":").toList()
-            val policy = Policy(record[0].toInt(), record[1].toInt(), record[2].single())
-            Record(policy, record[4])
-        }.filter {
-            it.valiatePass() == true
+            x += 3
+            if (x > 30) {
+                x -= 31
+            }
+
         }
 
-
-
-        Log.d("AoC", records.count().toString());
-
-
-
-//        println(.contentToString())
-
-
-
+        Log.d("AoC", treeCounter.toString());
     }
 }
 
