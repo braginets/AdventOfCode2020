@@ -14,36 +14,22 @@ class MainActivity : AppCompatActivity() {
 
     fun readFile(): Array<String> {
         val inputString = application.assets.open("data.txt").bufferedReader().use { it.readText() }
-        val list: List<String> = inputString.split("\n")
+        val list: List<String> = inputString.split("\n\n")
         return list.toTypedArray()
     }
 
     data class Slope(val x: Int, val y: Int)
 
-    private fun treeCounter(data: Array<String>, slope: Slope): Int {
+    private fun validatePassport(data: Array<String>): Boolean {
 
-        var x: Int = 0
-        var y: Int = 0
-        val lineLength = 31
-
-        var treeCounter: Int = 0
-
-        while (y < data.count()) {
-
-            if (data[y].get(x) == '#') {
-                treeCounter ++
-            }
-
-            x += slope.x
-            y += slope.y
-
-            if (x > (lineLength - 1)) {
-                x -= lineLength
-            }
-
-        }
-
-        return treeCounter
+        if (!data.contains("byr")) return false
+        if (!data.contains("iyr")) return false
+        if (!data.contains("eyr")) return false
+        if (!data.contains("hgt")) return false
+        if (!data.contains("hcl")) return false
+        if (!data.contains("ecl")) return false
+        if (!data.contains("pid")) return false
+        return true
     }
 
     private fun start() {
@@ -51,17 +37,14 @@ class MainActivity : AppCompatActivity() {
         Log.d("AoC", "Start");
         val data = readFile()
 
-        val slopes = arrayOf(Slope(1,1), Slope(3,1), Slope(5,1), Slope(7,1), Slope(1,2))
-
-        var trees: Int = 1
-
-        for (slope in slopes) {
-            val treesForSlope = treeCounter(data, slope)
-            Log.d("AoC - trees", treesForSlope.toString());
-            trees *= treesForSlope
+        var validPassports: Int = 0
+        for (passportData in data) {
+            val passport = passportData.split(" ", ":","\n").toTypedArray()
+            Log.d("AoC - pass", passport.toString());
+            if (validatePassport(passport)) { validPassports += 1 }
         }
 
-        Log.d("AoC - result", trees.toString());
+        Log.d("AoC - result", validPassports.toString());
     }
 }
 
