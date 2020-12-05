@@ -39,12 +39,18 @@ class MainActivity : AppCompatActivity() {
         val data = readFile()
 
         val ids = data.map {
-            val row = getRow(it.dropLast(3))
-            val column = getColumn(it.takeLast(3))
-            row * 8 + column
-        }
+                val row = getRow(it.dropLast(3))
+                val column = getColumn(it.takeLast(3))
+                row * 8 + column
+            }
+            .sorted()
 
-        Log.d("AoC - result", "${ids.max()}");
+        var seatID = ids.first()
+        var i: Int = 0
+
+        while (ids[i] == (i + seatID)) { i++ }
+
+        Log.d("AoC - result", "${i + seatID}");
     }
 }
 
