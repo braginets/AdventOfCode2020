@@ -27,9 +27,14 @@ class MainActivity : AppCompatActivity() {
         val answer = data
             .map { it.split("\n")
                 .map { it.toSet() }
-                .flatMap { it.asIterable() }
-                .toSet()
                 }
+            .map {
+                var set = it.first().toMutableSet()
+                for (a in it) {
+                    set.retainAll(a)
+                }
+                set
+            }
             .flatMap { it.asIterable() }
             .count()
 
