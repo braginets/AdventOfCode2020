@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     fun bagParser(data: Array<String>): Int {
 
         // key is the innner bag, value is list of all outer bags
-        var reversedBags = HashMap<String, MutableList<Bag>>()
+        var bagsStore = HashMap<String, MutableList<Bag>>()
 
          data.forEach {
 
@@ -40,35 +40,35 @@ class MainActivity : AppCompatActivity() {
                 val components = it.split(" ")
                 val amount = components.first().toInt()
                 val bagColor = components.drop(1).joinToString(" ")
-                val bag = Bag(outer, amount)
+                val bag = Bag(bagColor, amount)
 
-                val bags: List<Bag> = reversedBags[bagColor] ?: listOf()
-                reversedBags[bagColor] = (bags + listOf(bag)).toMutableList()
+                val bags: List<Bag> = bagsStore[outer] ?: listOf()
+                bagsStore[outer] = (bags + listOf(bag)).toMutableList()
             }
 
         }
 
-        return  findParents("shiny gold",reversedBags).toSet().count()
+        Log.d("AoC - data", "${bagsStore}");
+
+        return  findBags("shiny gold",1, bagsStore).count() - 1
     }
 
 
-    fun findParents(bag: String, data: HashMap<String, MutableList<Bag>>): List<String> {
+    fun findBags(bag: String, amount: Int, data: HashMap<String, MutableList<Bag>>): List<String> {
 
-        val parents = data[bag] ?: return listOf(bag)
-        val chain = parents.map {
-                listOf(it.color) + findParents(it.color, data)
-            }.flatten().toList()
-        return chain
+        //how do you multiply elements in collections properly in Kotlin?
+        val children = data[bag] ?: return Collections.nCopies(amount, bag)
+
+        val chain = children.map {
+                findBags(it.color, it.amount, data)
+            }.flatten()
+
+        return Collections.nCopies(amount, bag) + Collections.nCopies(amount, chain).flatten()
         }
 
     private fun start() {
 
-        Log.d("AoC", "Start");
         val data = readFile()
-
-        Log.d("AoC", "${bagParser(data)}");
-
-
     }
 }
 
