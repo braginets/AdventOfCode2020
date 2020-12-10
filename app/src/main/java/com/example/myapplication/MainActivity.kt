@@ -23,120 +23,55 @@ class MainActivity : AppCompatActivity() {
         return inputString.split("\n").toTypedArray()
     }
 
-    data class Bag(val color: String, val amount: Int)
-
-    fun bagParser(data: List<String>): Int {
-
-        // key is the innner bag, value is list of all outer bags
-        var bagsStore = HashMap<String, MutableList<Bag>>()
-
-         data.forEach {
-
-             // Learn finally regular expressions, Eugene!!!!
-            val rule = it.split(" bags contain no other bags.", " bags contain ", " bag, ", " bags, ", " bag.", " bags.").dropLast(1)
-            val outer = rule.first()
-            rule.drop(1).forEach {
-                val components = it.split(" ")
-                val amount = components.first().toInt()
-                val bagColor = components.drop(1).joinToString(" ")
-                val bag = Bag(bagColor, amount)
-
-                val bags: List<Bag> = bagsStore[outer] ?: listOf()
-                bagsStore[outer] = (bags + listOf(bag)).toMutableList()
+        fun check(data: List<Long>, number: Long): Boolean {
+            data.forEach() { i1 ->
+                val res = data.find { i2 -> i1 + i2 == number && i1 != i2  }
+                if (res != null) return true
             }
-
+            return  false
         }
 
-        Log.d("AoC - data", "${bagsStore}");
 
-        return  findBags("shiny gold",1, bagsStore).count() - 1
+    fun solveProblem1(data: List<Long>, preamble: Int): Long {
+
+        for (i in preamble until data.size) {
+            if (!check(data.subList(i - preamble, i), data[i])) {
+                return data[i]
+            }
+        }
+        return -1
     }
 
-    fun findBags(bag: String, amount: Int, data: HashMap<String, MutableList<Bag>>): List<String> {
+    fun solveProblem2(data: List<Long>): Long {
+        val target = solveProblem1(data, 25)
+        var i = 0
+        var i1 = 0
+        var sum: Long = 0
 
-        //how do you multiply elements in collections properly in Kotlin?
-        val children = data[bag] ?: return Collections.nCopies(amount, bag)
-
-        val chain = children.map {
-                findBags(it.color, it.amount, data)
-            }.flatten()
-
-        return Collections.nCopies(amount, bag) + Collections.nCopies(amount, chain).flatten()
-        }
-
-    data class Instruction(val operation: String, val argument: String)
-
-    private fun runCode(code: List<Instruction>): Int {
-
-        val c: List<Int> = code.withIndex().filter { it.value.operation == "jmp" || it.value.operation == "nop" }.map { it.index }
-        var result: Int = 0
-        for (it in c) {
-
-            var mutableCode = code.toMutableList()
-
-            val inToReplace = mutableCode[it]
-
-            if (inToReplace.operation == "jmp") {
-                mutableCode[it] = Instruction("nop", inToReplace.argument)
-            } else if (inToReplace.operation == "nop") {
-                mutableCode[it] = Instruction("jmp", inToReplace.argument)
-            }
-
-            var accumulator: Int = 0
-            var offset: Int = 0
-            var offsets = mutableSetOf<Int>()
-            var solved = true
-
-            while (offset != mutableCode.count()) {
-
-                val instruction = mutableCode[offset]
-
-                if (offsets.contains(offset)) {
-                    solved = false
-                    break
-                }
-
-                offsets.add(offset)
-                if (instruction.operation == "acc") {
-                    accumulator += instruction.argument.toInt()
-                    offset += 1
-                } else if (instruction.operation == "jmp") {
-                    offset += instruction.argument.toInt()
-                } else if (instruction.operation == "nop") {
-                    offset += 1
-                }
-
-            }
-
-            if (solved) {
-                result = accumulator
-                break
+        while (i < data.size) {
+            if (sum == target && i + 1 < i1) {
+                val range = data.subList(i, i1)
+                return range.min()!! + range.max()!!
+            } else if (sum < target && i1 < data.size) {
+                sum += data[i1++]
+            } else if (i < data.size) {
+                sum -= data[i++]
             }
         }
-
-        return result
-    }
-
-
-    private fun problem1(data: List<String>) {
-        Log.d("AoC - data", "${bagParser(data)}");
-    }
-
-    private fun problem2(data: List<String>) {
-        val code = data.map {
-            val instr = it.split(" ")
-            Instruction(instr[0], instr[1])
-        }
-
-        runCode(code)
+        return -1
     }
 
     private fun start() {
 
-        val data = readFile().toList()
+        Log.d("AoC", "start")
 
-//        problem1(data)
-        problem2(data)
+        val data = readFile().toList().map { it.toLong() }
+        val result1 = solveProblem1(data, 25)
+        val result2 = solveProblem2(data)
+
+
+        Log.d("AoC", "$result1")
+        Log.d("AoC", "$result2")
     }
 }
 
