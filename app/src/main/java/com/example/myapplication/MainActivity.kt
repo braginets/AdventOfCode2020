@@ -23,54 +23,61 @@ class MainActivity : AppCompatActivity() {
         return inputString.split("\n").toTypedArray()
     }
 
-        fun check(data: List<Long>, number: Long): Boolean {
-            data.forEach() { i1 ->
-                val res = data.find { i2 -> i1 + i2 == number && i1 != i2  }
-                if (res != null) return true
+
+    fun solveProblem1(data: List<Int>): Int {
+        val sortedAdapters = data.sorted()
+        val maxAdapter = sortedAdapters.max()!!
+
+        var adapter = 0
+        var diffs = mutableListOf<Int>()
+        while (adapter < maxAdapter) {
+            val newAdapter = sortedAdapters.first {
+                val validation= (it in adapter+1..adapter+3)
+                validation
             }
-            return  false
+            diffs.add(newAdapter - adapter)
+            adapter = newAdapter
+            Log.d("AoC", "adapter: $adapter")
         }
+        var diffsMap = diffs.groupingBy { it }.eachCount()
+        Log.d("AoC", "diffs: ${diffsMap}")
 
-
-    fun solveProblem1(data: List<Long>, preamble: Int): Long {
-
-        for (i in preamble until data.size) {
-            if (!check(data.subList(i - preamble, i), data[i])) {
-                return data[i]
-            }
-        }
-        return -1
+        return diffsMap[1]!! * (diffsMap[3]!! + 1)
     }
 
-    fun solveProblem2(data: List<Long>): Long {
-        val target = solveProblem1(data, 25)
-        var i = 0
-        var i1 = 0
-        var sum: Long = 0
 
-        while (i < data.size) {
-            if (sum == target && i + 1 < i1) {
-                val range = data.subList(i, i1)
-                return range.min()!! + range.max()!!
-            } else if (sum < target && i1 < data.size) {
-                sum += data[i1++]
-            } else if (i < data.size) {
-                sum -= data[i++]
-            }
+    fun solveProblem2(data: List<Int>): Long {
+        val sortedAdapters = data.sorted()
+        Log.d("AoC", "sorted: ${sortedAdapters}")
+
+        val paths = mutableMapOf<Int, Long>()
+
+        //initialize paths
+            paths[1] = 1
+            paths[2] = 1
+//            paths[3] = 1
+
+        for (a in sortedAdapters) {
+            val sum = (paths[a - 3] ?: 0) + (paths[a - 2] ?: 0) + (paths[a - 1] ?: 0) + (paths[a] ?: 0)
+            paths[a] = sum
         }
-        return -1
+        return paths[sortedAdapters.last()]!!
+
     }
+
 
     private fun start() {
 
         Log.d("AoC", "start")
 
-        val data = readFile().toList().map { it.toLong() }
-        val result1 = solveProblem1(data, 25)
+
+        val data = readFile().toList().map { it.toInt() }
+
+//        val e = rle(data)
+//        val result1 = solveProblem1(data)
         val result2 = solveProblem2(data)
 
-
-        Log.d("AoC", "$result1")
+//        Log.d("AoC", "$result1")
         Log.d("AoC", "$result2")
     }
 }
